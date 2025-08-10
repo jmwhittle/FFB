@@ -225,8 +225,185 @@ class Transaction(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class NFLWeeklyStats(Base):
+    """NFL weekly player statistics from nfl_data_py."""
+    __tablename__ = "nfl_weekly_stats"
+    
+    # Composite primary key
+    player_id = Column(String, primary_key=True)
+    season = Column(Integer, primary_key=True)
+    week = Column(Integer, primary_key=True)
+    
+    # Player info
+    player_name = Column(String)
+    player_display_name = Column(String)
+    position = Column(String)
+    position_group = Column(String)
+    team = Column(String)
+    
+    # Game info
+    opponent_team = Column(String)
+    season_type = Column(String)  # REG, POST
+    
+    # Passing stats
+    completions = Column(Float)
+    attempts = Column(Float)
+    passing_yards = Column(Float)
+    passing_tds = Column(Float)
+    interceptions = Column(Float)
+    sacks = Column(Float)
+    sack_yards = Column(Float)
+    sack_fumbles = Column(Float)
+    sack_fumbles_lost = Column(Float)
+    passing_air_yards = Column(Float)
+    passing_yards_after_catch = Column(Float)
+    passing_first_downs = Column(Float)
+    passing_epa = Column(Float)
+    passing_2pt_conversions = Column(Float)
+    
+    # Rushing stats
+    carries = Column(Float)
+    rushing_yards = Column(Float)
+    rushing_tds = Column(Float)
+    rushing_fumbles = Column(Float)
+    rushing_fumbles_lost = Column(Float)
+    rushing_first_downs = Column(Float)
+    rushing_epa = Column(Float)
+    rushing_2pt_conversions = Column(Float)
+    
+    # Receiving stats
+    targets = Column(Float)
+    receptions = Column(Float)
+    receiving_yards = Column(Float)
+    receiving_tds = Column(Float)
+    receiving_fumbles = Column(Float)
+    receiving_fumbles_lost = Column(Float)
+    receiving_air_yards = Column(Float)
+    receiving_yards_after_catch = Column(Float)
+    receiving_first_downs = Column(Float)
+    receiving_epa = Column(Float)
+    receiving_2pt_conversions = Column(Float)
+    
+    # Special teams
+    special_teams_tds = Column(Float)
+    
+    # Fantasy points
+    fantasy_points = Column(Float)
+    fantasy_points_ppr = Column(Float)
+    
+    # Target share and snap counts
+    target_share = Column(Float)
+    air_yards_share = Column(Float)
+    wopr = Column(Float)  # Weighted Opportunity Rating
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class NFLSeasonalStats(Base):
+    """NFL seasonal (aggregated) player statistics from nfl_data_py."""
+    __tablename__ = "nfl_seasonal_stats"
+    
+    # Composite primary key
+    player_id = Column(String, primary_key=True)
+    season = Column(Integer, primary_key=True)
+    
+    # Player info
+    player_name = Column(String)
+    player_display_name = Column(String)
+    position = Column(String)
+    position_group = Column(String)
+    team = Column(String)  # Most recent team
+    
+    # Season summary
+    games_played = Column(Integer)
+    season_type = Column(String)  # REG, POST, or BOTH
+    
+    # Passing stats (season totals)
+    completions = Column(Float)
+    attempts = Column(Float)
+    passing_yards = Column(Float)
+    passing_tds = Column(Float)
+    interceptions = Column(Float)
+    sacks = Column(Float)
+    sack_yards = Column(Float)
+    sack_fumbles = Column(Float)
+    sack_fumbles_lost = Column(Float)
+    passing_air_yards = Column(Float)
+    passing_yards_after_catch = Column(Float)
+    passing_first_downs = Column(Float)
+    passing_epa = Column(Float)
+    passing_2pt_conversions = Column(Float)
+    
+    # Passing efficiency (calculated)
+    completion_percentage = Column(Float)
+    yards_per_attempt = Column(Float)
+    yards_per_completion = Column(Float)
+    passer_rating = Column(Float)
+    
+    # Rushing stats (season totals)
+    carries = Column(Float)
+    rushing_yards = Column(Float)
+    rushing_tds = Column(Float)
+    rushing_fumbles = Column(Float)
+    rushing_fumbles_lost = Column(Float)
+    rushing_first_downs = Column(Float)
+    rushing_epa = Column(Float)
+    rushing_2pt_conversions = Column(Float)
+    
+    # Rushing efficiency (calculated)
+    yards_per_carry = Column(Float)
+    
+    # Receiving stats (season totals)
+    targets = Column(Float)
+    receptions = Column(Float)
+    receiving_yards = Column(Float)
+    receiving_tds = Column(Float)
+    receiving_fumbles = Column(Float)
+    receiving_fumbles_lost = Column(Float)
+    receiving_air_yards = Column(Float)
+    receiving_yards_after_catch = Column(Float)
+    receiving_first_downs = Column(Float)
+    receiving_epa = Column(Float)
+    receiving_2pt_conversions = Column(Float)
+    
+    # Receiving efficiency (calculated)
+    catch_percentage = Column(Float)
+    yards_per_target = Column(Float)
+    yards_per_reception = Column(Float)
+    average_depth_of_target = Column(Float)
+    
+    # Special teams
+    special_teams_tds = Column(Float)
+    
+    # Fantasy points (season totals)
+    fantasy_points = Column(Float)
+    fantasy_points_ppr = Column(Float)
+    
+    # Advanced metrics (season averages)
+    target_share = Column(Float)
+    air_yards_share = Column(Float)
+    wopr = Column(Float)  # Weighted Opportunity Rating
+    
+    # Market share metrics
+    team_pass_attempts = Column(Float)
+    team_targets = Column(Float)
+    team_carries = Column(Float)
+    
+    # Consistency metrics
+    fantasy_points_per_game = Column(Float)
+    fantasy_points_ppr_per_game = Column(Float)
+    weeks_with_10plus_points = Column(Integer)
+    weeks_with_20plus_points = Column(Integer)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 # Export all models for easy importing
 __all__ = [
     "User", "League", "Player", "Roster", "RosterEntry", 
-    "Matchup", "PlayerStats", "Transaction"
+    "Matchup", "PlayerStats", "Transaction", "NFLWeeklyStats", "NFLSeasonalStats"
 ]
