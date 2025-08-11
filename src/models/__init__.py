@@ -239,7 +239,8 @@ class NFLWeeklyStats(Base):
     player_display_name = Column(String)
     position = Column(String)
     position_group = Column(String)
-    team = Column(String)
+    recent_team = Column(String)
+    headshot_url = Column(String)
     
     # Game info
     opponent_team = Column(String)
@@ -295,6 +296,9 @@ class NFLWeeklyStats(Base):
     target_share = Column(Float)
     air_yards_share = Column(Float)
     wopr = Column(Float)  # Weighted Opportunity Rating
+    pacr = Column(Float)  # Passer Air Conversion Ratio
+    racr = Column(Float)  # Receiver Air Conversion Ratio
+    dakota = Column(Float)  # Dakota completion percentage
     
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -402,8 +406,138 @@ class NFLSeasonalStats(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class NFLContractInfo(Base):
+    """NFL player contract information from 1999-present."""
+    __tablename__ = "nfl_contract_info"
+    
+    # Composite primary key
+    player_id = Column(String, primary_key=True)
+    season = Column(Integer, primary_key=True)
+    
+    # Player info
+    player_name = Column(String)
+    player_display_name = Column(String)
+    position = Column(String)
+    team = Column(String)
+    
+    # Contract details
+    contract_value_total = Column(Float)  # Total contract value
+    contract_length_years = Column(Integer)  # Contract length in years
+    contract_year = Column(Integer)  # Which year of contract (1st, 2nd, etc.)
+    contract_signed_date = Column(DateTime)  # When contract was signed
+    
+    # Annual compensation
+    base_salary = Column(Float)  # Base salary for the season
+    signing_bonus = Column(Float)  # Signing bonus (prorated)
+    roster_bonus = Column(Float)  # Roster bonus
+    workout_bonus = Column(Float)  # Workout bonus
+    incentives_likely = Column(Float)  # Likely to be earned incentives
+    incentives_unlikely = Column(Float)  # Unlikely to be earned incentives
+    
+    # Cap impact
+    cap_hit = Column(Float)  # Total cap hit for the season
+    cap_percent = Column(Float)  # Percentage of team's total cap
+    dead_money = Column(Float)  # Dead money if cut
+    
+    # Contract type and status
+    contract_type = Column(String)  # 'rookie', 'extension', 'free_agent', 'franchise_tag', etc.
+    guaranteed_money = Column(Float)  # Guaranteed money remaining
+    is_franchise_tag = Column(Boolean, default=False)
+    is_transition_tag = Column(Boolean, default=False)
+    
+    # Performance clauses
+    has_performance_incentives = Column(Boolean, default=False)
+    has_playing_time_incentives = Column(Boolean, default=False)
+    has_statistical_incentives = Column(Boolean, default=False)
+    
+    # Contract notes
+    contract_notes = Column(Text)  # Additional contract details
+    source = Column(String)  # Data source (Spotrac, OverTheCap, etc.)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class NFLOfficials(Base):
+    """NFL Officials and Officiating Crew model."""
+    __tablename__ = "nfl_officials"
+    
+    # Composite primary key: game_id + official_id
+    game_id = Column(String, primary_key=True)  # NFL game identifier
+    official_id = Column(String, primary_key=True)  # Official identifier
+    
+    # Game information
+    season = Column(Integer, nullable=False)
+    week = Column(Integer, nullable=False)
+    game_date = Column(String)
+    home_team = Column(String)
+    away_team = Column(String)
+    
+    # Official information
+    official_name = Column(String, nullable=False)
+    position = Column(String, nullable=False)  # Referee, Umpire, Line Judge, etc.
+    jersey_number = Column(String)
+    years_experience = Column(Integer)
+    
+    # Officiating statistics for this game
+    total_penalties_called = Column(Integer, default=0)
+    penalty_yards_assessed = Column(Integer, default=0)
+    flags_thrown = Column(Integer, default=0)
+    flags_picked_up = Column(Integer, default=0)
+    
+    # Penalty breakdown by type
+    holding_penalties = Column(Integer, default=0)
+    false_start_penalties = Column(Integer, default=0)
+    pass_interference_penalties = Column(Integer, default=0)
+    roughing_penalties = Column(Integer, default=0)
+    unsportsmanlike_conduct = Column(Integer, default=0)
+    delay_of_game = Column(Integer, default=0)
+    offensive_penalties = Column(Integer, default=0)
+    defensive_penalties = Column(Integer, default=0)
+    
+    # Game flow impact
+    total_penalty_yards_home = Column(Integer, default=0)
+    total_penalty_yards_away = Column(Integer, default=0)
+    penalties_affecting_touchdowns = Column(Integer, default=0)
+    penalties_affecting_turnovers = Column(Integer, default=0)
+    
+    # Challenge and review statistics
+    challenges_total = Column(Integer, default=0)
+    challenges_overturned = Column(Integer, default=0)
+    automatic_reviews = Column(Integer, default=0)
+    reviews_overturned = Column(Integer, default=0)
+    
+    # Crew information
+    crew_id = Column(String)  # Identifies the officiating crew
+    is_head_referee = Column(Boolean, default=False)
+    is_playoff_eligible = Column(Boolean, default=False)
+    
+    # Performance metrics
+    game_control_rating = Column(Float)  # 1-10 scale
+    consistency_rating = Column(Float)  # 1-10 scale
+    accuracy_rating = Column(Float)  # 1-10 scale
+    
+    # Career statistics (updated per official per season)
+    career_games_officiated = Column(Integer, default=0)
+    career_playoff_games = Column(Integer, default=0)
+    career_super_bowls = Column(Integer, default=0)
+    
+    # Notes and additional information
+    officiating_notes = Column(Text)  # Any special notes about officiating
+    controversial_calls = Column(Text)  # Documentation of controversial calls
+    
+    # Data source and quality
+    data_source = Column(String)  # Where the data came from
+    data_quality = Column(String)  # Quality rating of the data
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 # Export all models for easy importing
 __all__ = [
     "User", "League", "Player", "Roster", "RosterEntry", 
-    "Matchup", "PlayerStats", "Transaction", "NFLWeeklyStats", "NFLSeasonalStats"
+    "Matchup", "PlayerStats", "Transaction", "NFLWeeklyStats", "NFLSeasonalStats", "NFLContractInfo", "NFLOfficials"
 ]
